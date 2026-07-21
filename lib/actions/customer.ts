@@ -88,4 +88,7 @@ export async function deleteCustomer(id: string) {
   }
 
   revalidatePath("/customer");
+  revalidatePath("/mesin");
+  revalidatePath("/report");
+  revalidatePath("/dashboard");
 }
