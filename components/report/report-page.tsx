@@ -47,13 +47,7 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
         return;
       }
 
-      const { error } = await supabase
-
-        .from("report_harian")
-
-        .upsert(payload, {
-          onConflict: "tanggal,customer_id,mesin_id",
-        });
+      const { error } = await supabase.from("report_harian").insert(payload);
 
       if (error) throw error;
 
