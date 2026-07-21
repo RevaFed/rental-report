@@ -11,15 +11,15 @@ export async function getMesin() {
     .from("mesin")
     .select(
       `
+    id,
+    customer_id,
+    tipe_mesin,
+    nomor_seri,
+    customer (
       id,
-      customer_id,
-      tipe_mesin,
-      nomor_seri,
-      customer (
-        id,
-        nama
-      )
-    `,
+      nama
+    )
+  `,
     )
     .order("created_at", {
       ascending: false,
@@ -29,7 +29,10 @@ export async function getMesin() {
     throw new Error(error.message);
   }
 
-  return data;
+  return (data ?? []).map((item: any) => ({
+    ...item,
+    customer: Array.isArray(item.customer) ? (item.customer[0] ?? null) : item.customer,
+  }));
 }
 
 export async function getMesinByCustomer(customerId: string) {

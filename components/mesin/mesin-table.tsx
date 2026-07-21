@@ -20,19 +20,15 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
 
   const filtered = useMemo(() => {
     return data.filter((item) => {
-      return (item.customer[0]?.nama ?? "").toLowerCase().includes(search.toLowerCase()) || item.tipe_mesin.toLowerCase().includes(search.toLowerCase()) || item.nomor_seri.toLowerCase().includes(search.toLowerCase());
+      return (item.customer?.nama ?? "").toLowerCase().includes(search.toLowerCase()) || item.tipe_mesin.toLowerCase().includes(search.toLowerCase()) || item.nomor_seri.toLowerCase().includes(search.toLowerCase());
     });
   }, [search, data]);
 
   return (
     <>
-      {/* SEARCH */}
-
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <MesinSearch value={search} onChange={setSearch} />
       </div>
-
-      {/* TABLE */}
 
       <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
         <div className="overflow-x-auto">
@@ -64,7 +60,7 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
                 <tr key={item.id} className="border-t transition hover:bg-gray-50">
                   <td className="p-3 text-center">{index + 1}</td>
 
-                  <td className="p-3 font-medium whitespace-nowrap">{item.customer[0]?.nama ?? "-"}</td>
+                  <td className="p-3 font-medium whitespace-nowrap">{item.customer?.nama ?? "-"}</td>
 
                   <td className="p-3 whitespace-nowrap">{item.tipe_mesin}</td>
 

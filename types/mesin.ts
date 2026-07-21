@@ -9,8 +9,5 @@ export type Mesin = {
   tipe_mesin: string;
   nomor_seri: string;
 
-  customer: {
-    id: string;
-    nama: string;
-  }[];
+  customer: Customer | null;
 };
