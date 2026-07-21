@@ -318,5 +318,5 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
   doc.text("(....................)", 148, footerY + 27, {
     align: "center",
   });
-  doc.save(`Report-${tanggal}.pdf`);
+  doc.save(`Jadwal Kunjungan INDRA-${tanggalFormat}.pdf`);
 }
