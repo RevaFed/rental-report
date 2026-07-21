@@ -7,20 +7,7 @@ import MesinAction from "./mesin-action";
 import MesinEditDialog from "./mesin-edit-dialog";
 import MesinDeleteDialog from "./mesin-delete-dialog";
 
-type Mesin = {
-  id: string;
-  tipe_mesin: string;
-  nomor_seri: string;
-
-  customer: {
-    nama: string;
-  };
-};
-
-type Customer = {
-  id: string;
-  nama: string;
-};
+import type { Mesin, Customer } from "@/types/mesin";
 
 export default function MesinTable({ data, customers }: { data: Mesin[]; customers: Customer[] }) {
   const [search, setSearch] = useState("");
@@ -33,7 +20,7 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
 
   const filtered = useMemo(() => {
     return data.filter((item) => {
-      return item.customer.nama.toLowerCase().includes(search.toLowerCase()) || item.tipe_mesin.toLowerCase().includes(search.toLowerCase()) || item.nomor_seri.toLowerCase().includes(search.toLowerCase());
+      return (item.customer[0]?.nama ?? "").toLowerCase().includes(search.toLowerCase()) || item.tipe_mesin.toLowerCase().includes(search.toLowerCase()) || item.nomor_seri.toLowerCase().includes(search.toLowerCase());
     });
   }, [search, data]);
 
@@ -77,7 +64,7 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
                 <tr key={item.id} className="border-t transition hover:bg-gray-50">
                   <td className="p-3 text-center">{index + 1}</td>
 
-                  <td className="p-3 font-medium whitespace-nowrap">{item.customer.nama}</td>
+                  <td className="p-3 font-medium whitespace-nowrap">{item.customer[0]?.nama ?? "-"}</td>
 
                   <td className="p-3 whitespace-nowrap">{item.tipe_mesin}</td>
 

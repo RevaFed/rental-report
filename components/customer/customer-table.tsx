@@ -7,11 +7,7 @@ import CustomerAction from "./customer-action";
 import CustomerEditDialog from "./customer-edit-dialog";
 import CustomerDeleteDialog from "./customer-delete-dialog";
 
-type Customer = {
-  id: string;
-  nama: string;
-  alamat: string;
-};
+import type { Customer } from "@/types/database";
 
 export default function CustomerTable({ data }: { data: Customer[] }) {
   const [search, setSearch] = useState("");

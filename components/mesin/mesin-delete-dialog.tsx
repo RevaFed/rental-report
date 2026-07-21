@@ -6,14 +6,12 @@ import { deleteMesin } from "@/lib/actions/mesin";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
+import type { Mesin } from "@/types/mesin";
+
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-
-  mesin: {
-    id: string;
-    tipe_mesin: string;
-  } | null;
+  mesin: Mesin | null;
 };
 
 export default function MesinDeleteDialog({ open, onOpenChange, mesin }: Props) {
@@ -35,7 +33,7 @@ export default function MesinDeleteDialog({ open, onOpenChange, mesin }: Props) 
           <AlertDialogTitle>Hapus Mesin</AlertDialogTitle>
 
           <AlertDialogDescription>
-            Hapus mesin
+            Yakin ingin menghapus mesin
             <b> {mesin.tipe_mesin}</b>?
           </AlertDialogDescription>
         </AlertDialogHeader>

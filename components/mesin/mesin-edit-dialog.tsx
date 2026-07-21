@@ -4,17 +4,7 @@ import { updateMesin } from "@/lib/actions/mesin";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-type Customer = {
-  id: string;
-  nama: string;
-};
-
-type Mesin = {
-  id: string;
-  customer_id: string;
-  tipe_mesin: string;
-  nomor_seri: string;
-};
+import type { Mesin, Customer } from "@/types/mesin";
 
 type Props = {
   open: boolean;

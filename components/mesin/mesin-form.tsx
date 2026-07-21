@@ -4,10 +4,7 @@ import { createMesin } from "@/lib/actions/mesin";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-type Customer = {
-  id: string;
-  nama: string;
-};
+import type { Customer } from "@/types/database";
 
 export default function MesinForm({ customers }: { customers: Customer[] }) {
   return (

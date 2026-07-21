@@ -4,12 +4,7 @@ import { useActionState } from "react";
 
 import { updateProfile } from "@/lib/actions/profile";
 
-type User = {
-  id: number;
-  nama: string;
-  username: string;
-};
-
+import type { User } from "@/types/database";
 type Props = {
   user: User;
 };
