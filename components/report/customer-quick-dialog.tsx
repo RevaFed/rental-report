@@ -63,19 +63,19 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 md:items-center">
+      <div className="my-6 w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl md:rounded-2xl">
         {/* HEADER */}
 
-        <div className="flex items-center justify-between border-b px-6 py-5">
+        <div className="flex items-start justify-between gap-3 border-b px-4 py-4 md:px-6 md:py-5">
           <div>
             <div className="flex items-center gap-2">
               <UserPlus size={22} className="text-blue-600" />
 
-              <h2 className="text-xl font-bold">Tambah Customer</h2>
+              <h2 className="text-lg font-bold md:text-xl">Tambah Customer</h2>
             </div>
 
-            <p className="mt-1 text-sm text-gray-500">Tambahkan customer beserta mesin pertamanya.</p>
+            <p className="mt-1 text-xs text-gray-500 md:text-sm">Tambahkan customer beserta mesin pertamanya.</p>
           </div>
 
           <button
@@ -89,10 +89,10 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
           </button>
         </div>
 
-        <div className="space-y-6 p-6">
+        <div className="space-y-5 p-4 md:space-y-6 md:p-6">
           {/* CUSTOMER */}
 
-          <div className="rounded-xl border bg-gray-50 p-5">
+          <div className="rounded-xl border bg-gray-50 p-4 md:p-5">
             <div className="mb-4 flex items-center gap-2">
               <Building2 size={18} className="text-blue-600" />
 
@@ -130,7 +130,7 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
               <div>
                 <label className="mb-2 block text-sm font-medium">Tipe Mesin</label>
 
-                <input value={tipeMesin} onChange={(e) => setTipeMesin(e.target.value)} placeholder="Canon IR2525" className="w-full rounded-lg border px-4 py-2.5 outline-none transition focus:border-blue-500" />
+                <input value={tipeMesin} onChange={(e) => setTipeMesin(e.target.value)} placeholder="Canon IR2525" className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 md:px-4" />
               </div>
 
               <div>
@@ -139,7 +139,7 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
                   Nomor Seri
                 </label>
 
-                <input value={nomorSeri} onChange={(e) => setNomorSeri(e.target.value)} placeholder="ABC123456" className="w-full rounded-lg border px-4 py-2.5 outline-none transition focus:border-blue-500" />
+                <input value={nomorSeri} onChange={(e) => setNomorSeri(e.target.value)} placeholder="ABC123456" className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 md:px-4" />
               </div>
             </div>
           </div>
@@ -153,12 +153,12 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
               resetForm();
               onClose();
             }}
-            className="rounded-lg border px-5 py-2.5 font-medium transition hover:bg-gray-100"
+            className="w-full rounded-lg border px-5 py-2.5 font-medium transition hover:bg-gray-100 md:w-auto"
           >
             Batal
           </button>
 
-          <button onClick={handleSave} disabled={saving} className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+          <button onClick={handleSave} disabled={saving} className="w-full rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto">
             {saving ? "Menyimpan..." : "Simpan Customer"}
           </button>
         </div>

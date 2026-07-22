@@ -31,6 +31,11 @@ export default function CustomerBackupDialog({ open, onClose, onCreated }: Props
     setNomorSeri("");
   }
 
+  function handleClose() {
+    resetForm();
+    onClose();
+  }
+
   function handleSave() {
     if (!customer.trim()) {
       alert("Nama customer wajib diisi.");
@@ -59,34 +64,27 @@ export default function CustomerBackupDialog({ open, onClose, onCreated }: Props
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4">
+      <div className="flex w-full max-w-2xl max-h-[95vh] flex-col overflow-hidden rounded-xl bg-white shadow-2xl sm:rounded-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-6 py-5">
+        <div className="flex items-start justify-between border-b px-4 py-4 sm:px-6 sm:py-5">
           <div>
-            <h2 className="text-xl font-bold">Customer Backup</h2>
+            <h2 className="text-lg font-bold sm:text-xl">Customer Backup</h2>
 
-            <p className="mt-1 text-sm text-gray-500">Tambahkan customer sementara beserta data mesin.</p>
+            <p className="mt-1 text-xs text-gray-500 sm:text-sm">Tambahkan customer sementara beserta data mesin.</p>
           </div>
 
-          <button
-            onClick={() => {
-              resetForm();
-              onClose();
-            }}
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
-          >
+          <button onClick={handleClose} className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100">
             <X size={20} />
           </button>
         </div>
 
-        <div className="space-y-6 p-6">
-          {/* CUSTOMER */}
-
-          <div className="rounded-xl border bg-gray-50 p-5">
+        {/* Body */}
+        <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:space-y-6 sm:p-6">
+          {/* Customer */}
+          <div className="rounded-xl border bg-gray-50 p-4 sm:p-5">
             <div className="mb-4 flex items-center gap-2">
               <Building2 size={18} className="text-blue-600" />
-
               <h3 className="font-semibold">Informasi Customer</h3>
             </div>
 
@@ -94,7 +92,7 @@ export default function CustomerBackupDialog({ open, onClose, onCreated }: Props
               <div>
                 <label className="mb-2 block text-sm font-medium">Nama Customer</label>
 
-                <input value={customer} onChange={(e) => setCustomer(e.target.value)} placeholder="Contoh : PT Maju Jaya" className="w-full rounded-lg border px-4 py-2.5 outline-none transition focus:border-blue-500" />
+                <input value={customer} onChange={(e) => setCustomer(e.target.value)} placeholder="Contoh : PT Maju Jaya" className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 sm:px-4" />
               </div>
 
               <div>
@@ -103,25 +101,29 @@ export default function CustomerBackupDialog({ open, onClose, onCreated }: Props
                   Alamat
                 </label>
 
-                <textarea rows={3} value={alamat} onChange={(e) => setAlamat(e.target.value)} placeholder="Alamat customer..." className="w-full rounded-lg border px-4 py-2.5 outline-none transition focus:border-blue-500" />
+                <textarea
+                  rows={3}
+                  value={alamat}
+                  onChange={(e) => setAlamat(e.target.value)}
+                  placeholder="Alamat customer..."
+                  className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 sm:px-4 resize-none"
+                />
               </div>
             </div>
           </div>
 
-          {/* MESIN */}
-
-          <div className="rounded-xl border bg-gray-50 p-5">
+          {/* Mesin */}
+          <div className="rounded-xl border bg-gray-50 p-4 sm:p-5">
             <div className="mb-4 flex items-center gap-2">
               <Printer size={18} className="text-green-600" />
-
               <h3 className="font-semibold">Informasi Mesin</h3>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-2 block text-sm font-medium">Tipe Mesin</label>
 
-                <input value={tipeMesin} onChange={(e) => setTipeMesin(e.target.value)} placeholder="Contoh : Canon IR2525" className="w-full rounded-lg border px-4 py-2.5 outline-none transition focus:border-blue-500" />
+                <input value={tipeMesin} onChange={(e) => setTipeMesin(e.target.value)} placeholder="Contoh : Canon IR2525" className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 sm:px-4" />
               </div>
 
               <div>
@@ -130,26 +132,19 @@ export default function CustomerBackupDialog({ open, onClose, onCreated }: Props
                   Nomor Seri
                 </label>
 
-                <input value={nomorSeri} onChange={(e) => setNomorSeri(e.target.value)} placeholder="Contoh : ABC123456" className="w-full rounded-lg border px-4 py-2.5 outline-none transition focus:border-blue-500" />
+                <input value={nomorSeri} onChange={(e) => setNomorSeri(e.target.value)} placeholder="Contoh : ABC123456" className="w-full rounded-lg border px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 sm:px-4" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-
-        <div className="flex justify-end gap-3 border-t px-6 py-5">
-          <button
-            onClick={() => {
-              resetForm();
-              onClose();
-            }}
-            className="rounded-lg border px-5 py-2.5 font-medium transition hover:bg-gray-100"
-          >
+        <div className="flex flex-col-reverse gap-3 border-t bg-white px-4 py-4 sm:flex-row sm:justify-end sm:px-6 sm:py-5">
+          <button onClick={handleClose} className="w-full rounded-lg border px-5 py-2.5 font-medium transition hover:bg-gray-100 sm:w-auto">
             Batal
           </button>
 
-          <button onClick={handleSave} className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700">
+          <button onClick={handleSave} className="w-full rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 sm:w-auto">
             Simpan Customer Backup
           </button>
         </div>
