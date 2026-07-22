@@ -1,8 +1,11 @@
 "use client";
 
 import { Trash2, Plus } from "lucide-react";
-
+import { useState } from "react";
 import { ReportRow, Customer, Mesin } from "@/types/report";
+import CustomerQuickDialog from "./customer-quick-dialog";
+import CustomerBackupDialog, { BackupCustomerData } from "./customer-backup-dialog";
+import { UserPlus, Building2 } from "lucide-react";
 
 type Props = {
   rows: ReportRow[];
@@ -15,6 +18,12 @@ type Props = {
 };
 
 export default function ReportTable({ rows, setRows, customers, mesin }: Props) {
+  const [openCustomerDialog, setOpenCustomerDialog] = useState(false);
+
+  const [selectedRow, setSelectedRow] = useState<number | null>(null);
+  const [mesinList, setMesinList] = useState(mesin);
+  const [customerList, setCustomerList] = useState(customers);
+  const [openBackupDialog, setOpenBackupDialog] = useState(false);
   function tambahBaris() {
     setRows([
       ...rows,
@@ -24,11 +33,14 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
         jenis: "PM",
 
         customer_id: "",
-
         mesin_id: "",
 
-        tipe_mesin: "",
+        // Customer Backup
+        is_backup: false,
+        customer_backup: "",
+        alamat_backup: "",
 
+        tipe_mesin: "",
         nomor_seri: "",
 
         masalah: "",
@@ -55,17 +67,19 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
     };
 
     if (field === "customer_id") {
+      temp[index].customer_id = value;
+
       temp[index].mesin_id = "";
       temp[index].tipe_mesin = "";
       temp[index].nomor_seri = "";
     }
 
     if (field === "mesin_id") {
-      const pilihMesin = mesin.find((m) => m.id === value);
+      const pilihMesin = mesinList.find((m) => m.id === value);
 
       if (pilihMesin) {
+        temp[index].mesin_id = value;
         temp[index].tipe_mesin = pilihMesin.tipe_mesin;
-
         temp[index].nomor_seri = pilihMesin.nomor_seri;
       }
     }
@@ -110,8 +124,8 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
                 <th className="min-w-[250px] p-3 text-left">Masalah</th>
                 <th className="w-32 p-3 text-center">Jam In</th>
                 <th className="w-32 p-3 text-center">Jam Out</th>
-                <th className="min-w-[220px] p-3 text-left">Ket</th>
-                <th className="w-16 p-3"></th>
+                <th className="w-24 p-3 text-center">Ket</th>
+                <th className="w-12 p-3 text-center">Aksi</th>
               </tr>
             </thead>
 
@@ -125,7 +139,7 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
               )}
 
               {rows.map((row, index) => {
-                const mesinCustomer = mesin.filter((m) => m.customer_id === row.customer_id);
+                const mesinCustomer = mesinList.filter((m) => m.customer_id === row.customer_id);
 
                 return (
                   <tr key={row.id}>
@@ -165,69 +179,96 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
                     </td>
 
                     <td className="p-2">
-                      <select
-                        className="
-                      w-full
-                      rounded-lg
-                      border
-                      px-3
-                      py-2
-                      text-sm
-                      outline-none
-                      focus:border-black
-                      "
-                        value={row.customer_id}
-                        onChange={(e) =>
-                          updateRow(
-                            index,
+                      <div className="space-y-2">
+                        {row.is_backup ? (
+                          <div className="rounded-lg border border-amber-300 bg-amber-50 p-3">
+                            <div className="mb-2 flex items-center justify-between">
+                              <span className="rounded bg-amber-500 px-2 py-1 text-xs font-semibold text-white">Customer Backup</span>
 
-                            "customer_id",
+                              <button
+                                type="button"
+                                title="Edit Customer Backup"
+                                onClick={() => {
+                                  setSelectedRow(index);
+                                  setOpenBackupDialog(true);
+                                }}
+                                className="flex h-8 w-8 items-center justify-center rounded-lg border border-amber-300 bg-white text-amber-600 hover:bg-amber-100"
+                              >
+                                <Building2 size={16} />
+                              </button>
+                            </div>
 
-                            e.target.value,
-                          )
-                        }
-                      >
-                        <option value="">Pilih</option>
+                            <div className="font-semibold">{row.customer_backup}</div>
 
-                        {customers.map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.nama}
-                          </option>
-                        ))}
-                      </select>
+                            <div className="text-sm text-gray-500">{row.alamat_backup}</div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <select className="flex-1 rounded-lg border px-3 py-2 text-sm outline-none focus:border-black" value={row.customer_id} onChange={(e) => updateRow(index, "customer_id", e.target.value)}>
+                              <option value="">Pilih</option>
+
+                              {customerList.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                  {c.nama}
+                                </option>
+                              ))}
+                            </select>
+
+                            <button
+                              type="button"
+                              title="Tambah Customer"
+                              onClick={() => {
+                                setSelectedRow(index);
+                                setOpenCustomerDialog(true);
+                              }}
+                              className="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-300 bg-blue-50 text-blue-600 hover:bg-blue-100"
+                            >
+                              <UserPlus size={18} />
+                            </button>
+
+                            <button
+                              type="button"
+                              title="Customer Backup"
+                              onClick={() => {
+                                setSelectedRow(index);
+                                setOpenBackupDialog(true);
+                              }}
+                              className="flex h-10 w-10 items-center justify-center rounded-lg border border-amber-300 bg-amber-50 text-amber-600 hover:bg-amber-100"
+                            >
+                              <Building2 size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </td>
 
                     <td className="p-2">
-                      <select
-                        className="
-                        w-full
-                        rounded-lg
-                        border
-                        px-3
-                        py-2
-                        text-sm
-                        outline-none
-                        focus:border-black
-                        "
-                        value={row.mesin_id}
-                        onChange={(e) =>
-                          updateRow(
-                            index,
+                      {row.is_backup ? (
+                        <div className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm">{row.nomor_seri}</div>
+                      ) : (
+                        <select
+                          className="
+                              w-full
+                              rounded-lg
+                              border
+                              px-3
+                              py-2
+                              text-sm
+                              outline-none
+                              focus:border-black
+                            "
+                          value={row.mesin_id}
+                          onChange={(e) => updateRow(index, "mesin_id", e.target.value)}
+                        >
+                          <option value="">Pilih</option>
 
-                            "mesin_id",
-
-                            e.target.value,
-                          )
-                        }
-                      >
-                        <option value="">Pilih</option>
-
-                        {mesinCustomer.map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.nomor_seri}
-                          </option>
-                        ))}
-                      </select>
+                          {mesinCustomer.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.nomor_seri}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </td>
 
                     <td className="p-2">{row.tipe_mesin}</td>
@@ -309,43 +350,30 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
                       />
                     </td>
 
-                    <td className="p-2">
-                      <input
-                        className="
-                        w-full
-                        rounded-lg
-                        border
-                        px-3
-                        py-2
-                        text-sm
-                        outline-none
-                        focus:border-black
-                        "
+                    <td className="w-24 p-2 text-center">
+                      <select
                         value={row.keterangan}
-                        onChange={(e) =>
-                          updateRow(
-                            index,
-
-                            "keterangan",
-
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </td>
-
-                    <td className="p-2">
-                      <button
-                        onClick={() => hapusBaris(row.id)}
+                        onChange={(e) => updateRow(index, "keterangan", e.target.value)}
                         className="
-                        rounded-lg
-                        p-2
-                        text-red-500
-                        transition
-                        hover:bg-red-50
+                          w-full
+                          rounded-lg
+                          border
+                          px-2
+                          py-2
+                          text-sm
+                          outline-none
+                          focus:border-black
                         "
                       >
-                        <Trash2 size={18} />
+                        <option value="">Pilih</option>
+                        <option value="OK">OK</option>
+                        <option value="OTH">OTH</option>
+                        <option value="FU">FU</option>
+                      </select>
+                    </td>
+                    <td className="w-12 p-2 text-center align-middle">
+                      <button onClick={() => hapusBaris(row.id)} className="inline-flex h-8 w-8 items-center justify-center rounded-md text-red-500 hover:bg-red-50">
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
@@ -353,6 +381,57 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
               })}
             </tbody>
           </table>
+          <CustomerQuickDialog
+            open={openCustomerDialog}
+            onClose={() => setOpenCustomerDialog(false)}
+            onCreated={({ customer, mesin }) => {
+              // Tambahkan customer baru
+              setCustomerList((prev) => [...prev, customer]);
+
+              // Tambahkan mesin baru
+              setMesinList((prev) => [...prev, mesin]);
+
+              if (selectedRow !== null) {
+                // Pilih customer
+                updateRow(selectedRow, "customer_id", customer.id);
+
+                // Pilih mesin
+                updateRow(selectedRow, "mesin_id", mesin.id);
+              }
+
+              setOpenCustomerDialog(false);
+            }}
+          />
+          <CustomerBackupDialog
+            open={openBackupDialog}
+            onClose={() => setOpenBackupDialog(false)}
+            onCreated={(data: BackupCustomerData) => {
+              if (selectedRow === null) return;
+
+              setRows((prev) =>
+                prev.map((row, i) => {
+                  if (i !== selectedRow) return row;
+
+                  return {
+                    ...row,
+
+                    is_backup: true,
+
+                    customer_backup: data.customer,
+                    alamat_backup: data.alamat,
+
+                    customer_id: "",
+                    mesin_id: "",
+
+                    tipe_mesin: data.tipe_mesin,
+                    nomor_seri: data.nomor_seri,
+                  };
+                }),
+              );
+
+              setOpenBackupDialog(false);
+            }}
+          />
         </div>
       </div>
     </div>

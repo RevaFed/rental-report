@@ -11,7 +11,7 @@ export type PdfRow = {
   keterangan: string;
 };
 
-export async function exportReportPDF(tanggal: string, teknisi: string, wilayah: string, rows: PdfRow[]) {
+export async function exportReportPDF(tanggal: string, teknisi: string, wilayah: string, note: string, rows: PdfRow[]) {
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -28,24 +28,28 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
     year: "numeric",
   });
 
-  const startX = 5;
-  const startY = 36;
-
   const col = {
     no: 10,
     jenis: 10,
-    customer: 50,
+    customer: 46,
     type: 20,
-    seri: 35,
-    masalah: 42,
+    seri: 33,
+    masalah: 40,
     jamIn: 11,
     jamOut: 11,
     ket: 8,
   };
+
   const headerHeight = 6.8;
   const rowHeight = 5.8;
 
+  // Margin kiri & kanan
+  const startX = 10;
+  const startY = 36;
+
+  // Hitung total lebar tabel
   const totalWidth = col.no + col.jenis + col.customer + col.type + col.seri + col.masalah + col.jamIn + col.jamOut + col.ket;
+  const footerY = startY + headerHeight + rowHeight * 11;
 
   /* ===========================
       HEADER
@@ -273,35 +277,38 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
   /* Border luar */
   doc.rect(startX, startY, totalWidth, headerHeight + rowHeight * 10);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+
+  doc.text("Note :", 155, footerY - 1);
+
+  doc.setFont("helvetica", "normal");
+
+  const noteLines = doc.splitTextToSize(
+    note || "-",
+    40, // lebar maksimal note (mm)
+  );
+
+  doc.text(noteLines, 155, footerY + 3);
   /* ===========================
     FOOTER
 =========================== */
-
-  const footerY = startY + headerHeight + rowHeight * 11;
 
   doc.setFont("helvetica", "bold");
 
   doc.setFontSize(10);
 
-  doc.text("Teknisi", 28, footerY, {
+  doc.text("Teknisi", 22, footerY, {
     align: "center",
   });
 
-  doc.text("Leader", 88, footerY, {
+  doc.text("Leader", 72, footerY, {
     align: "center",
   });
 
-  doc.text("Supervisor", 148, footerY, {
+  doc.text("Supervisor", 122, footerY, {
     align: "center",
   });
-
-  /* Garis */
-
-  doc.line(15, footerY + 22, 40, footerY + 22);
-
-  doc.line(75, footerY + 22, 100, footerY + 22);
-
-  doc.line(135, footerY + 22, 160, footerY + 22);
 
   doc.setFont("helvetica", "normal");
 
@@ -311,11 +318,11 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
     align: "center",
   });
 
-  doc.text("Pramono", 88, footerY + 27, {
+  doc.text("Pramono", 73, footerY + 27, {
     align: "center",
   });
 
-  doc.text("(....................)", 148, footerY + 27, {
+  doc.text("", 148, footerY + 27, {
     align: "center",
   });
   doc.save(`Jadwal Kunjungan INDRA-${tanggalFormat}.pdf`);

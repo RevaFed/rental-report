@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Users, Printer, ClipboardList, CalendarDays } from "lucide-react";
+import { Users, Printer, ClipboardList, CalendarDays, Building2, CircleDashed, CheckCircle2 } from "lucide-react";
 
 import StatCard from "./stat-card";
 import JenisCard from "./jenis-card";
@@ -19,6 +19,9 @@ type Props = {
     mesin: number;
     reportHariIni: number;
     reportBulan: number;
+    sudahDikunjungi: number;
+    belumDikunjungi: number;
+    customerBackup: number;
   };
 
   jenis: {
@@ -54,14 +57,20 @@ export default function DashboardPage({ month, year, stats, jenis, chart, today,
 
       {/* CARD */}
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard title="Total Customer" value={stats.customer} icon={<Users size={24} />} color="blue" />
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7">
+        <StatCard title="Total Customer" value={stats.customer} icon={<Users size={20} />} color="blue" />
 
-        <StatCard title="Total Mesin" value={stats.mesin} icon={<Printer size={24} />} color="green" />
+        <StatCard title="Total Mesin" value={stats.mesin} icon={<Printer size={20} />} color="green" />
 
-        <StatCard title="Report Hari Ini" value={stats.reportHariIni} icon={<ClipboardList size={24} />} color="orange" />
+        <StatCard title="Report Hari Ini" value={stats.reportHariIni} icon={<ClipboardList size={20} />} color="orange" />
 
-        <StatCard title="Report Bulan Ini" value={stats.reportBulan} icon={<CalendarDays size={24} />} color="red" />
+        <StatCard title="Report Bulan Ini" value={stats.reportBulan} icon={<CalendarDays size={20} />} color="red" />
+
+        <StatCard title="Sudah Dikunjungi" value={stats.sudahDikunjungi} icon={<CheckCircle2 size={20} />} color="green" />
+
+        <StatCard title="Belum Dikunjungi" value={stats.belumDikunjungi} icon={<CircleDashed size={20} />} color="orange" />
+
+        <StatCard title="Customer Backup" value={stats.customerBackup} icon={<Building2 size={20} />} color="blue" />
       </div>
 
       {/* JENIS */}

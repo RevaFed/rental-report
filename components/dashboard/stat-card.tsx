@@ -4,7 +4,7 @@ type Props = {
   title: string;
   value: number;
   icon: ReactNode;
-  color: "blue" | "green" | "orange" | "red";
+  color: "blue" | "green" | "orange" | "red" | "emerald" | "rose";
 };
 
 const colors = {
@@ -31,21 +31,59 @@ const colors = {
     text: "text-red-600",
     border: "border-red-200",
   },
+
+  emerald: {
+    bg: "bg-emerald-100",
+    text: "text-emerald-600",
+    border: "border-emerald-200",
+  },
+
+  rose: {
+    bg: "bg-rose-100",
+    text: "text-rose-600",
+    border: "border-rose-200",
+  },
 };
 
 export default function StatCard({ title, value, icon, color }: Props) {
   const c = colors[color];
 
   return (
-    <div className={`rounded-2xl border ${c.border} bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
+    <div
+      className={`
+        rounded-2xl
+        border
+        ${c.border}
+        bg-white
+        p-5
+        shadow-sm
+        transition-all
+        duration-300
+        hover:-translate-y-1
+        hover:shadow-lg
+      `}
+    >
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-gray-500">{title}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{title}</p>
 
-          <h2 className="mt-2 text-3xl font-bold md:text-4xl">{value}</h2>
+          <h2 className="mt-2 text-2xl font-bold text-gray-900 md:text-3xl">{value.toLocaleString("id-ID")}</h2>
         </div>
 
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${c.bg} ${c.text} md:h-14 md:w-14`}>{icon}</div>
+        <div
+          className={`
+    flex
+    h-9
+    w-9
+    items-center
+    justify-center
+    rounded-lg
+    ${c.bg}
+    ${c.text}
+  `}
+        >
+          {icon}
+        </div>
       </div>
     </div>
   );

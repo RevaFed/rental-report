@@ -7,6 +7,18 @@ export type ReportRow = {
 
   mesin_id: string;
 
+  // =========================
+  // CUSTOMER BACKUP
+  // =========================
+
+  is_backup: boolean;
+
+  customer_backup: string;
+
+  alamat_backup: string;
+
+  // =========================
+
   tipe_mesin: string;
 
   nomor_seri: string;

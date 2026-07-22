@@ -24,9 +24,8 @@ export default function ReportPrint({ tanggal, teknisi, wilayah, rows }: Props) 
       <style jsx global>{`
         @page {
           size: A5 landscape;
-          margin: 8mm;
+          margin: 10mm;
         }
-
         @media print {
           html,
           body {
@@ -44,13 +43,16 @@ export default function ReportPrint({ tanggal, teknisi, wilayah, rows }: Props) 
       <div
         id="print-area"
         style={{
-          width: "198mm",
-          height: "136mm",
-          padding: "3mm",
+          width: "100%",
+          maxWidth: "190mm",
+          minHeight: "128mm",
+          margin: "0 auto",
+          padding: "0",
           overflow: "hidden",
           background: "#fff",
           fontFamily: "Calibri",
           fontSize: "10px",
+          boxSizing: "border-box",
         }}
       >
         {/* HEADER */}
@@ -71,6 +73,8 @@ export default function ReportPrint({ tanggal, teknisi, wilayah, rows }: Props) 
             width: "100%",
             borderCollapse: "collapse",
             marginBottom: "10px",
+            marginLeft: "4mm",
+            marginRight: "4mm",
           }}
         >
           <tbody>
@@ -106,6 +110,8 @@ export default function ReportPrint({ tanggal, teknisi, wilayah, rows }: Props) 
           style={{
             width: "100%",
             borderCollapse: "collapse",
+            marginLeft: "4mm",
+            marginRight: "4mm",
           }}
         >
           <thead>
@@ -184,6 +190,8 @@ export default function ReportPrint({ tanggal, teknisi, wilayah, rows }: Props) 
           style={{
             width: "100%",
             borderCollapse: "collapse",
+            marginLeft: "4mm",
+            marginRight: "4mm",
           }}
         >
           <tbody>
@@ -235,17 +243,13 @@ export default function ReportPrint({ tanggal, teknisi, wilayah, rows }: Props) 
                 style={{
                   textAlign: "center",
                 }}
-              >
-                (........................)
-              </td>
+              ></td>
 
               <td
                 style={{
                   textAlign: "center",
                 }}
-              >
-                (........................)
-              </td>
+              ></td>
             </tr>
           </tbody>
         </table>

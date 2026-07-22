@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import ReportToolbar from "./report-toolbar";
 import ReportTable from "./report-table";
 
@@ -18,7 +17,7 @@ type Props = {
 
 export default function ReportPage({ customers, mesin, initialTanggal }: Props) {
   const today = new Date().toISOString().split("T")[0];
-
+  const [note, setNote] = useState("");
   const [tanggal, setTanggal] = useState(initialTanggal ?? today);
 
   const [rows, setRows] = useState<ReportRow[]>([]);
@@ -30,16 +29,41 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
       setSaving(true);
 
       const payload = rows
-        .filter((row) => row.customer_id !== "" && row.mesin_id !== "")
+        .filter((row) => {
+          if (row.is_backup) {
+            return row.customer_backup.trim() !== "";
+          }
+
+          return row.customer_id !== "" && row.mesin_id !== "";
+        })
         .map((row) => ({
           tanggal,
-          customer_id: row.customer_id,
-          mesin_id: row.mesin_id,
+
+          customer_id: row.is_backup ? null : row.customer_id,
+
+          mesin_id: row.is_backup ? null : row.mesin_id,
+
+          is_backup: row.is_backup,
+
+          customer_backup: row.is_backup ? row.customer_backup : null,
+
+          alamat_backup: row.is_backup ? row.alamat_backup : null,
+
+          tipe_mesin_backup: row.is_backup ? row.tipe_mesin : null,
+
+          nomor_seri_backup: row.is_backup ? row.nomor_seri : null,
+
           jenis: row.jenis,
+
           masalah: row.masalah || null,
+
           jam_masuk: row.jam_masuk || null,
+
           jam_keluar: row.jam_keluar || null,
+
           keterangan: row.keterangan || null,
+
+          note: note || null,
         }));
 
       if (payload.length === 0) {
@@ -52,9 +76,14 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
       if (error) throw error;
 
       alert("Report berhasil disimpan.");
-    } catch (error) {
-      console.error(error);
-      alert("Gagal menyimpan report.");
+    } catch (error: any) {
+      console.log("ERROR:", error);
+      console.log("MESSAGE:", error?.message);
+      console.log("DETAILS:", error?.details);
+      console.log("HINT:", error?.hint);
+      console.log("CODE:", error?.code);
+
+      alert(error?.message ?? "Gagal menyimpan report.");
     } finally {
       setSaving(false);
     }
@@ -67,9 +96,13 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
       console.error(error);
       return;
     }
+    if (data.length > 0) {
+      setNote(data[0].note ?? "");
+    } else {
+      setNote("");
+    }
 
     const reportRows: ReportRow[] = data.map((item) => {
-      // Cari data mesin dari array mesin yang sudah dikirim ke ReportPage
       const dataMesin = mesin.find((m) => m.id === item.mesin_id);
 
       return {
@@ -77,13 +110,19 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
 
         jenis: item.jenis,
 
-        customer_id: item.customer_id,
+        customer_id: item.customer_id ?? "",
 
-        mesin_id: item.mesin_id,
+        mesin_id: item.mesin_id ?? "",
 
-        tipe_mesin: dataMesin?.tipe_mesin ?? "",
+        is_backup: item.is_backup ?? false,
 
-        nomor_seri: dataMesin?.nomor_seri ?? "",
+        customer_backup: item.customer_backup ?? "",
+
+        alamat_backup: item.alamat_backup ?? "",
+
+        tipe_mesin: item.is_backup ? (item.tipe_mesin_backup ?? "") : (dataMesin?.tipe_mesin ?? ""),
+
+        nomor_seri: item.is_backup ? (item.nomor_seri_backup ?? "") : (dataMesin?.nomor_seri ?? ""),
 
         masalah: item.masalah ?? "",
 
@@ -101,18 +140,24 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
   async function handleExportPDF() {
     const pdfRows = rows.map((row) => ({
       jenis: row.jenis,
-      customer: customers.find((c) => c.id === row.customer_id)?.nama ?? "",
+
+      customer: row.is_backup ? row.customer_backup : (customers.find((c) => c.id === row.customer_id)?.nama ?? ""),
+
       tipe_mesin: row.tipe_mesin,
+
       nomor_seri: row.nomor_seri,
+
       masalah: row.masalah,
+
       jam_masuk: row.jam_masuk,
+
       jam_keluar: row.jam_keluar,
+
       keterangan: row.keterangan,
     }));
 
-    await exportReportPDF(tanggal, "Agus Indra Wijaya", "Barat - Pusat - Utara", pdfRows);
+    await exportReportPDF(tanggal, "Agus Indra Wijaya", "Barat - Pusat - Utara", note, pdfRows);
   }
-
   useEffect(() => {
     loadReport();
   }, [tanggal]);
@@ -139,7 +184,7 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
       </div>
 
       {/* Toolbar */}
-      <ReportToolbar tanggal={tanggal} teknisi="Agus Indra Wijaya" wilayah="Barat - Pusat - Utara" onTanggal={setTanggal} />
+      <ReportToolbar tanggal={tanggal} teknisi="Agus Indra Wijaya" wilayah="Barat - Pusat - Utara" note={note} onTanggal={setTanggal} onNote={setNote} />
 
       {/* Table */}
       <ReportTable rows={rows} setRows={setRows} customers={customers} mesin={mesin} />

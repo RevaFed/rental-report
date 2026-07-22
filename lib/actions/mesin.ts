@@ -29,10 +29,20 @@ export async function getMesin() {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((item: any) => ({
-    ...item,
-    customer: Array.isArray(item.customer) ? (item.customer[0] ?? null) : item.customer,
-  }));
+  return (data ?? [])
+    .map((item: any) => ({
+      ...item,
+      customer: Array.isArray(item.customer) ? (item.customer[0] ?? null) : item.customer,
+    }))
+    .sort((a, b) => {
+      const customerCompare = (a.customer?.nama ?? "").localeCompare(b.customer?.nama ?? "", "id", { sensitivity: "base" });
+
+      if (customerCompare !== 0) {
+        return customerCompare;
+      }
+
+      return a.nomor_seri.localeCompare(b.nomor_seri, "id", { numeric: true, sensitivity: "base" });
+    });
 }
 
 export async function getMesinByCustomer(customerId: string) {
