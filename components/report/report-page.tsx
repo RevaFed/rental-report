@@ -8,6 +8,8 @@ import { Customer, Mesin, ReportRow } from "@/types/report";
 import { supabase } from "@/lib/supabase/client";
 
 import { exportReportPDF } from "@/lib/pdf/report";
+import { exportReportExcel } from "@/lib/excel/report";
+import { FileSpreadsheet, FileText, Save } from "lucide-react";
 
 type Props = {
   customers: Customer[];
@@ -19,7 +21,6 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
   const today = new Date().toISOString().split("T")[0];
   const [note, setNote] = useState("");
   const [tanggal, setTanggal] = useState(initialTanggal ?? today);
-
   const [rows, setRows] = useState<ReportRow[]>([]);
 
   const [saving, setSaving] = useState(false);
@@ -158,6 +159,29 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
 
     await exportReportPDF(tanggal, "Agus Indra Wijaya", "Barat - Pusat - Utara", note, pdfRows);
   }
+
+  async function handleExportExcel() {
+    const excelRows = rows.map((row) => ({
+      jenis: row.jenis,
+
+      customer: row.is_backup ? row.customer_backup : (customers.find((c) => c.id === row.customer_id)?.nama ?? ""),
+
+      tipe_mesin: row.is_backup ? row.tipe_mesin : row.tipe_mesin,
+
+      nomor_seri: row.is_backup ? row.nomor_seri : row.nomor_seri,
+
+      masalah: row.masalah,
+
+      jam_masuk: row.jam_masuk,
+
+      jam_keluar: row.jam_keluar,
+
+      keterangan: row.keterangan,
+    }));
+
+    await exportReportExcel(tanggal, "Agus Indra Wijaya", "Barat - Pusat - Utara", note, excelRows);
+  }
+
   useEffect(() => {
     loadReport();
   }, [tanggal]);
@@ -165,29 +189,33 @@ export default function ReportPage({ customers, mesin, initialTanggal }: Props) 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Report Harian</h1>
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Report Harian</h1>
 
-          <p className="mt-1 text-sm text-gray-500">Input laporan kunjungan teknisi rental.</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button onClick={handleExportPDF} className="inline-flex items-center rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700">
-            📄 Export PDF
-          </button>
-
-          <button onClick={handleSave} disabled={saving} className="inline-flex items-center rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
-            {saving ? "Menyimpan..." : "💾 Simpan Report"}
-          </button>
-        </div>
+        <p className="mt-1 text-sm text-gray-500">Input laporan kunjungan teknisi rental.</p>
       </div>
+      {/* Action */}
+      <div className="flex flex-wrap gap-3">
+        <button onClick={handleExportPDF} className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700">
+          <FileText size={18} />
+          Export PDF
+        </button>
+
+        <button onClick={handleExportExcel} className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700">
+          <FileSpreadsheet size={18} />
+          Export Excel
+        </button>
+
+        <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+          <Save size={18} />
+          {saving ? "Menyimpan..." : "Simpan Report"}
+        </button>
+      </div>
+      {/* TABLE */}
+      <ReportTable rows={rows} setRows={setRows} customers={customers} mesin={mesin} />
 
       {/* Toolbar */}
       <ReportToolbar tanggal={tanggal} teknisi="Agus Indra Wijaya" wilayah="Barat - Pusat - Utara" note={note} onTanggal={setTanggal} onNote={setNote} />
-
-      {/* Table */}
-      <ReportTable rows={rows} setRows={setRows} customers={customers} mesin={mesin} />
     </div>
   );
 }

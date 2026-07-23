@@ -21,7 +21,7 @@ export async function getDashboardData(month: number, year: number) {
       CARD
   ==================================== */
 
-  const [customer, mesin, reportHariIni, customerHariIni, reportBulan, customerBackup] = await Promise.all([
+  const [customer, mesin, reportHariIni, reportBulan, customerHariIni, customerBackup] = await Promise.all([
     supabase.from("customer").select("*", {
       head: true,
       count: "exact",
@@ -40,6 +40,7 @@ export async function getDashboardData(month: number, year: number) {
       })
       .eq("tanggal", today),
 
+    // Report bulan
     supabase
       .from("report_harian")
       .select("*", {
@@ -49,8 +50,10 @@ export async function getDashboardData(month: number, year: number) {
       .gte("tanggal", startDate)
       .lte("tanggal", endDate),
 
-    // Customer yang dikunjungi hari ini
-    supabase.from("report_harian").select("customer_id").eq("tanggal", today),
+    // Mesin yang dikunjungi hari ini
+    supabase.from("report_harian").select("mesin_id").eq("tanggal", today),
+
+    // Customer Backup
     supabase
       .from("report_harian")
       .select("*", {
@@ -65,9 +68,11 @@ export async function getDashboardData(month: number, year: number) {
     CUSTOMER DIKUNJUNGI
 ==================================== */
 
-  const sudahDikunjungi = new Set(customerHariIni.data?.map((item) => item.customer_id) ?? []).size;
+  /* MESIN DIKUNJUNGI */
 
-  const belumDikunjungi = Math.max(0, (customer.count ?? 0) - sudahDikunjungi);
+  const sudahDikunjungi = new Set((customerHariIni.data ?? []).filter((item) => item.mesin_id).map((item) => item.mesin_id)).size;
+
+  const belumDikunjungi = Math.max(0, (mesin.count ?? 0) - sudahDikunjungi);
 
   /* ====================================
       JENIS
