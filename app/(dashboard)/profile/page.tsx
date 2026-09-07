@@ -1,16 +1,16 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import ProfilePage from "@/components/profile/profile-page";
-import { createSupabaseServer } from "@/lib/supabase/server";
+import { getProfile } from "@/lib/actions/profile";
+
+export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const supabase = createSupabaseServer();
+  try {
+    const user = await getProfile();
 
-  const { data } = await supabase.from("users").select("id,nama,username").limit(1).single();
-
-  if (!data) {
-    notFound();
+    return <ProfilePage user={user} />;
+  } catch {
+    redirect("/login");
   }
-
-  return <ProfilePage user={data} />;
 }

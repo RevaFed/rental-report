@@ -7,6 +7,9 @@ type User = {
   id: number;
   nama: string;
   username: string;
+  role: "admin" | "teknisi";
+  is_active: boolean;
+  wilayah: string | null;
 };
 
 type Props = {
@@ -16,8 +19,6 @@ type Props = {
 export default function ProfilePage({ user }: Props) {
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      {/* Header */}
-
       <div>
         <h1 className="text-3xl font-bold">Profil Saya</h1>
 

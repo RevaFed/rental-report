@@ -1,12 +1,11 @@
 import MesinForm from "@/components/mesin/mesin-form";
-import { getCustomers } from "@/lib/actions/customer";
-import { getMesin } from "@/lib/actions/mesin";
+import { getMesin, getMesinCustomers } from "@/lib/actions/mesin";
 import MesinTable from "@/components/mesin/mesin-table";
 
-export default async function MesinPage() {
-  const mesin = await getMesin();
+export const dynamic = "force-dynamic";
 
-  const customers = await getCustomers();
+export default async function MesinPage() {
+  const [mesin, customers] = await Promise.all([getMesin(), getMesinCustomers()]);
 
   return (
     <div className="space-y-6">

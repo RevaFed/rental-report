@@ -2,19 +2,13 @@
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil } from "lucide-react";
 
 type Props = {
   onEdit: () => void;
-
-  onDelete: () => void;
 };
 
-export default function CustomerAction({
-  onEdit,
-
-  onDelete,
-}: Props) {
+export default function CustomerAction({ onEdit }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -27,11 +21,6 @@ export default function CustomerAction({
         <DropdownMenuItem onClick={onEdit}>
           <Pencil className="mr-2 h-4 w-4" />
           Edit
-        </DropdownMenuItem>
-
-        <DropdownMenuItem onClick={onDelete} className="text-red-500">
-          <Trash2 className="mr-2 h-4 w-4" />
-          Hapus
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

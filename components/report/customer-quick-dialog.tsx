@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Building2, MapPin, Printer, Hash, X, UserPlus } from "lucide-react";
 
-import { createCustomerWithMesin } from "@/lib/actions/customer";
+import { createCustomerWithMesinForTechnician } from "@/lib/actions/report";
 import { Customer } from "@/types/report";
 
 type Props = {
@@ -17,7 +17,6 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
   const [alamat, setAlamat] = useState("");
   const [tipeMesin, setTipeMesin] = useState("");
   const [nomorSeri, setNomorSeri] = useState("");
-
   const [saving, setSaving] = useState(false);
 
   if (!open) return null;
@@ -48,15 +47,14 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
 
       setSaving(true);
 
-      const result = await createCustomerWithMesin(nama, alamat, tipeMesin, nomorSeri);
+      const result = await createCustomerWithMesinForTechnician(nama, alamat, tipeMesin, nomorSeri);
 
       onCreated(result);
-
       resetForm();
       onClose();
     } catch (error: any) {
       console.error(error);
-      alert(error.message ?? "Gagal menyimpan data.");
+      alert(error?.message ?? "Gagal menyimpan data.");
     } finally {
       setSaving(false);
     }
@@ -65,17 +63,14 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/40 p-4 md:items-center">
       <div className="my-6 w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl md:rounded-2xl">
-        {/* HEADER */}
-
         <div className="flex items-start justify-between gap-3 border-b px-4 py-4 md:px-6 md:py-5">
           <div>
             <div className="flex items-center gap-2">
               <UserPlus size={22} className="text-blue-600" />
-
               <h2 className="text-lg font-bold md:text-xl">Tambah Customer</h2>
             </div>
 
-            <p className="mt-1 text-xs text-gray-500 md:text-sm">Tambahkan customer beserta mesin pertamanya.</p>
+            <p className="mt-1 text-xs text-gray-500 md:text-sm">Customer baru otomatis ditugaskan ke akun teknisi yang sedang login.</p>
           </div>
 
           <button
@@ -90,12 +85,9 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
         </div>
 
         <div className="space-y-5 p-4 md:space-y-6 md:p-6">
-          {/* CUSTOMER */}
-
           <div className="rounded-xl border bg-gray-50 p-4 md:p-5">
             <div className="mb-4 flex items-center gap-2">
               <Building2 size={18} className="text-blue-600" />
-
               <h3 className="font-semibold">Informasi Customer</h3>
             </div>
 
@@ -117,12 +109,9 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
             </div>
           </div>
 
-          {/* MESIN */}
-
           <div className="rounded-xl border bg-gray-50 p-5">
             <div className="mb-4 flex items-center gap-2">
               <Printer size={18} className="text-green-600" />
-
               <h3 className="font-semibold">Mesin Pertama</h3>
             </div>
 
@@ -144,8 +133,6 @@ export default function CustomerQuickDialog({ open, onClose, onCreated }: Props)
             </div>
           </div>
         </div>
-
-        {/* FOOTER */}
 
         <div className="flex justify-end gap-3 border-t px-6 py-5">
           <button

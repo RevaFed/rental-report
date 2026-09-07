@@ -1,6 +1,8 @@
 import DashboardPage from "@/components/dashboard/dashboard-page";
 import { getDashboardData } from "@/lib/actions/dashboard";
 
+export const dynamic = "force-dynamic";
+
 type Props = {
   searchParams: Promise<{
     month?: string;
@@ -14,7 +16,6 @@ export default async function Page({ searchParams }: Props) {
   const now = new Date();
 
   const month = Number(params.month) || now.getMonth() + 1;
-
   const year = Number(params.year) || now.getFullYear();
 
   const data = await getDashboardData(month, year);

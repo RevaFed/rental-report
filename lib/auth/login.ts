@@ -30,6 +30,13 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
     };
   }
 
+  // Cek apakah akun aktif
+  if (user.is_active === false) {
+    return {
+      error: "Akun tidak aktif. Silakan hubungi administrator.",
+    };
+  }
+
   const valid = await comparePassword(password, user.password);
 
   if (!valid) {
@@ -47,6 +54,11 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
     path: "/",
     maxAge: 60 * 60 * 24 * 7, // 7 hari
   });
+
+  // Redirect berdasarkan role
+  if (user.role === "admin") {
+    redirect("/admin/dashboard");
+  }
 
   redirect("/dashboard");
 }

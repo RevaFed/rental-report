@@ -2,6 +2,8 @@ import CustomerTable from "@/components/customer/customer-table";
 import CustomerForm from "@/components/customer/customer-form";
 import { getCustomers } from "@/lib/actions/customer";
 
+export const dynamic = "force-dynamic";
+
 export default async function CustomerPage() {
   const customers = await getCustomers();
 
@@ -9,7 +11,6 @@ export default async function CustomerPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Master Customer</h1>
-
         <CustomerForm />
       </div>
 
