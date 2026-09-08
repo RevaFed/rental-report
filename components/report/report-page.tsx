@@ -348,6 +348,7 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
           Export Excel
         </button>
 
+        {/*
         <button
           onClick={() => setShareModal(true)}
           disabled={loading || rows.length === 0 || sharing}
@@ -356,6 +357,7 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
           <MessageCircle size={18} />
           Share ke WhatsApp
         </button>
+          */}
 
         <button onClick={handleSave} disabled={saving || loading} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
           <Save size={18} />
