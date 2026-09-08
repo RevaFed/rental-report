@@ -229,17 +229,7 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
     }
 
     try {
-      const canShare =
-        typeof navigator.canShare === "function"
-          ? navigator.canShare({
-              files: [file],
-            })
-          : false;
-
-      if (!canShare) {
-        return false;
-      }
-
+      // Coba share file langsung ke native Share Sheet HP
       await navigator.share({
         title: `Report Harian ${tanggal}`,
         text: getShareText(),
@@ -248,12 +238,12 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
 
       return true;
     } catch (error: any) {
+      // User menekan tombol Batal pada Share Sheet
       if (error?.name === "AbortError") {
         return true;
       }
 
       console.error("SHARE ERROR:", error);
-
       return false;
     }
   }
@@ -267,23 +257,7 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
       const shared = await shareFile(file);
 
       if (!shared) {
-        const url = URL.createObjectURL(file);
-
-        const link = document.createElement("a");
-
-        link.href = url;
-        link.download = file.name;
-
-        document.body.appendChild(link);
-
-        link.click();
-        link.remove();
-
-        URL.revokeObjectURL(url);
-
-        window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`, "_blank");
-
-        alert("PDF sudah didownload. WhatsApp dibuka. Silakan lampirkan PDF tersebut.");
+        alert("Browser HP ini tidak mendukung berbagi file langsung. Coba buka menggunakan Chrome atau Safari terbaru.");
       }
 
       setShareModal(false);
@@ -305,23 +279,7 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
       const shared = await shareFile(file);
 
       if (!shared) {
-        const url = URL.createObjectURL(file);
-
-        const link = document.createElement("a");
-
-        link.href = url;
-        link.download = file.name;
-
-        document.body.appendChild(link);
-
-        link.click();
-        link.remove();
-
-        URL.revokeObjectURL(url);
-
-        window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`, "_blank");
-
-        alert("Excel sudah didownload. WhatsApp dibuka. Silakan lampirkan Excel tersebut.");
+        alert("Browser HP ini tidak mendukung berbagi file langsung. Coba buka menggunakan Chrome atau Safari terbaru.");
       }
 
       setShareModal(false);
