@@ -1,5 +1,5 @@
 export type ReportRow = {
-  id: number;
+  id: string;
 
   jenis: "PM" | "CR" | "OTH" | "FU";
 

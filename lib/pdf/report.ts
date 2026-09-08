@@ -11,7 +11,7 @@ export type PdfRow = {
   keterangan: string;
 };
 
-export async function exportReportPDF(tanggal: string, teknisi: string, wilayah: string, note: string, rows: PdfRow[]) {
+export async function createReportPDF(tanggal: string, teknisi: string, wilayah: string, note: string, rows: PdfRow[]): Promise<File> {
   const doc = new jsPDF({
     orientation: "landscape",
     unit: "mm",
@@ -43,12 +43,11 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
   const headerHeight = 6.8;
   const rowHeight = 5.8;
 
-  // Margin kiri & kanan
   const startX = 10;
   const startY = 36;
 
-  // Hitung total lebar tabel
   const totalWidth = col.no + col.jenis + col.customer + col.type + col.seri + col.masalah + col.jamIn + col.jamOut + col.ket;
+
   const footerY = startY + headerHeight + rowHeight * 11;
 
   /* ===========================
@@ -78,87 +77,123 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
   doc.text("Wilayah", 145, 22);
   doc.text(":", 160, 22);
   doc.text(wilayah, 163, 22);
+
   /* ===========================
-    HEADER TABEL
-=========================== */
+      HEADER TABEL
+  =========================== */
 
   doc.setFont("helvetica", "bold");
+
   doc.setFontSize(7.5);
 
   let x = startX;
 
   /* No */
+
   doc.rect(x, startY, col.no, headerHeight);
+
   doc.text("No", x + col.no / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   x += col.no;
 
   /* Jenis */
+
   doc.rect(x, startY, col.jenis, headerHeight);
+
   doc.text("Jenis", x + col.jenis / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   x += col.jenis;
 
   /* Customer */
+
   doc.rect(x, startY, col.customer, headerHeight);
+
   doc.text("Customer", x + col.customer / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   x += col.customer;
 
   /* Type */
+
   doc.rect(x, startY, col.type, headerHeight);
+
   doc.text("Type", x + col.type / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   x += col.type;
 
   /* Nomor Seri */
+
   doc.rect(x, startY, col.seri, headerHeight);
+
   doc.setFontSize(7);
+
   doc.text("Nomor Seri", x + col.seri / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   doc.setFontSize(7.5);
+
   x += col.seri;
 
   /* Masalah */
+
   doc.rect(x, startY, col.masalah, headerHeight);
+
   doc.text("Masalah", x + col.masalah / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   x += col.masalah;
 
   /* Jam In */
+
   doc.rect(x, startY, col.jamIn, headerHeight);
+
   doc.setFontSize(6.5);
+
   doc.text("Jam In", x + col.jamIn / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   doc.setFontSize(7.5);
+
   x += col.jamIn;
 
   /* Jam Out */
+
   doc.rect(x, startY, col.jamOut, headerHeight);
+
   doc.setFontSize(6.5);
+
   doc.text("Jam Out", x + col.jamOut / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   doc.setFontSize(7.5);
+
   x += col.jamOut;
 
   /* Ket */
+
   doc.rect(x, startY, col.ket, headerHeight);
+
   doc.text("Ket", x + col.ket / 2, startY + headerHeight / 2 + 1, {
     align: "center",
   });
+
   /* ===========================
-    BODY TABEL
-=========================== */
+      BODY TABEL
+  =========================== */
 
   doc.setFont("helvetica", "normal");
+
   doc.setFontSize(8);
 
   for (let i = 0; i < 10; i++) {
@@ -168,7 +203,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     const data = rows[i];
 
-    /* ================= NO ================= */
+    /* NO */
 
     doc.rect(x, y, col.no, rowHeight);
 
@@ -180,7 +215,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.no;
 
-    /* ================= JENIS ================= */
+    /* JENIS */
 
     doc.rect(x, y, col.jenis, rowHeight);
 
@@ -192,7 +227,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.jenis;
 
-    /* ================= CUSTOMER ================= */
+    /* CUSTOMER */
 
     doc.rect(x, y, col.customer, rowHeight);
 
@@ -206,7 +241,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.customer;
 
-    /* ================= TYPE ================= */
+    /* TYPE */
 
     doc.rect(x, y, col.type, rowHeight);
 
@@ -218,7 +253,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.type;
 
-    /* ================= NOMOR SERI ================= */
+    /* NOMOR SERI */
 
     doc.rect(x, y, col.seri, rowHeight);
 
@@ -230,7 +265,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.seri;
 
-    /* ================= MASALAH ================= */
+    /* MASALAH */
 
     doc.rect(x, y, col.masalah, rowHeight);
 
@@ -240,7 +275,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.masalah;
 
-    /* ================= JAM IN ================= */
+    /* JAM IN */
 
     doc.rect(x, y, col.jamIn, rowHeight);
 
@@ -252,7 +287,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.jamIn;
 
-    /* ================= JAM OUT ================= */
+    /* JAM OUT */
 
     doc.rect(x, y, col.jamOut, rowHeight);
 
@@ -264,7 +299,7 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
 
     x += col.jamOut;
 
-    /* ================= KET ================= */
+    /* KET */
 
     doc.rect(x, y, col.ket, rowHeight);
 
@@ -275,24 +310,25 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
     }
   }
 
-  /* Border luar */
+  /* BORDER LUAR */
+
   doc.rect(startX, startY, totalWidth, headerHeight + rowHeight * 10);
+
   doc.setFont("helvetica", "bold");
+
   doc.setFontSize(8);
 
   doc.text("Note :", 155, footerY - 1);
 
   doc.setFont("helvetica", "normal");
 
-  const noteLines = doc.splitTextToSize(
-    note || "-",
-    40, // lebar maksimal note (mm)
-  );
+  const noteLines = doc.splitTextToSize(note || "-", 40);
 
   doc.text(noteLines, 155, footerY + 3);
+
   /* ===========================
-    FOOTER
-=========================== */
+      FOOTER
+  =========================== */
 
   doc.setFont("helvetica", "bold");
 
@@ -325,5 +361,33 @@ export async function exportReportPDF(tanggal: string, teknisi: string, wilayah:
   doc.text("", 148, footerY + 27, {
     align: "center",
   });
-  doc.save(`Jadwal Kunjungan INDRA-${tanggalFormat}.pdf`);
+
+  /* ===========================
+      FILE
+  =========================== */
+
+  const blob = doc.output("blob");
+
+  return new File([blob], `Jadwal Kunjungan INDRA-${tanggalFormat}.pdf`, {
+    type: "application/pdf",
+  });
+}
+
+export async function exportReportPDF(tanggal: string, teknisi: string, wilayah: string, note: string, rows: PdfRow[]) {
+  const file = await createReportPDF(tanggal, teknisi, wilayah, note, rows);
+
+  const url = URL.createObjectURL(file);
+
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = file.name;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  link.remove();
+
+  URL.revokeObjectURL(url);
 }

@@ -1,19 +1,19 @@
 "use client";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Archive } from "lucide-react";
 
 type Props = {
   onEdit: () => void;
+  onTarik: () => void;
   onDelete: () => void;
 };
 
-export default function MesinAction({ onEdit, onDelete }: Props) {
+export default function MesinAction({ onEdit, onTarik, onDelete }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="rounded-lg p-2 hover:bg-gray-100">
+        <button type="button" className="rounded-lg p-2 hover:bg-gray-100" aria-label="Action mesin">
           <MoreHorizontal size={18} />
         </button>
       </DropdownMenuTrigger>
@@ -24,7 +24,12 @@ export default function MesinAction({ onEdit, onDelete }: Props) {
           Edit
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onDelete} className="text-red-500">
+        <DropdownMenuItem onClick={onTarik}>
+          <Archive className="mr-2 h-4 w-4" />
+          Tarik
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={onDelete} className="text-red-500 focus:text-red-500">
           <Trash2 className="mr-2 h-4 w-4" />
           Hapus
         </DropdownMenuItem>

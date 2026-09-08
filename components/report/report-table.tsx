@@ -1,7 +1,7 @@
 "use client";
 
-import { Trash2, Plus } from "lucide-react";
-import { useState } from "react";
+import { Trash2, Plus, Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { ReportRow, Customer, Mesin } from "@/types/report";
 import CustomerQuickDialog from "./customer-quick-dialog";
 import CustomerBackupDialog, { BackupCustomerData } from "./customer-backup-dialog";
@@ -24,11 +24,37 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
   const [mesinList, setMesinList] = useState(mesin);
   const [customerList, setCustomerList] = useState(customers);
   const [openBackupDialog, setOpenBackupDialog] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [openCustomerSearch, setOpenCustomerSearch] = useState<number | null>(null);
+  const [customerDropdownRect, setCustomerDropdownRect] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
+  const customerDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (openCustomerSearch === null) return;
+
+    const handleScroll = (event: Event) => {
+      // Jangan tutup dropdown ketika user sedang scroll daftar customer.
+      if (customerDropdownRef.current?.contains(event.target as Node)) {
+        return;
+      }
+
+      // Kalau scroll terjadi di luar dropdown, tutup agar tidak menggantung.
+      setOpenCustomerSearch(null);
+      setCustomerDropdownRect(null);
+    };
+
+    window.addEventListener("scroll", handleScroll, true);
+    return () => window.removeEventListener("scroll", handleScroll, true);
+  }, [openCustomerSearch]);
   function tambahBaris() {
     setRows([
       ...rows,
       {
-        id: Date.now(),
+        id: `new-${Date.now()}`,
 
         jenis: "PM",
 
@@ -54,7 +80,7 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
     ]);
   }
 
-  function hapusBaris(id: number) {
+  function hapusBaris(id: string) {
     setRows(rows.filter((row) => row.id !== id));
   }
 
@@ -118,9 +144,9 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
               <tr>
                 <th className="w-14 p-3 text-center font-semibold">No</th>
                 <th className="w-24 p-3 text-center">Jenis</th>
-                <th className="min-w-[220px] p-3 text-left">Customer</th>
+                <th className="min-w-[320px] p-3 text-left">Customer</th>
                 <th className="min-w-[170px] p-3 text-left">Nomor Seri</th>
-                <th className="min-w-[120px] p-3 text-left">Type</th>
+                <th className="min-w-[90px] p-3 text-left">Type</th>
                 <th className="min-w-[250px] p-3 text-left">Masalah</th>
                 <th className="w-32 p-3 text-center">Jam In</th>
                 <th className="w-32 p-3 text-center">Jam Out</th>
@@ -204,15 +230,82 @@ export default function ReportTable({ rows, setRows, customers, mesin }: Props) 
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <select className="flex-1 rounded-lg border px-3 py-2 text-sm outline-none focus:border-black" value={row.customer_id} onChange={(e) => updateRow(index, "customer_id", e.target.value)}>
-                              <option value="">Pilih</option>
+                            <div className="relative flex-1">
+                              <button
+                                type="button"
+                                className="flex w-full items-center justify-between rounded-lg border bg-white px-3 py-2 text-left text-sm outline-none focus:border-black"
+                                onClick={(e) => {
+                                  if (openCustomerSearch === index) {
+                                    setOpenCustomerSearch(null);
+                                    setCustomerDropdownRect(null);
+                                    return;
+                                  }
 
-                              {customerList.map((c) => (
-                                <option key={c.id} value={c.id}>
-                                  {c.nama}
-                                </option>
-                              ))}
-                            </select>
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  setCustomerDropdownRect({
+                                    top: rect.bottom + 4,
+                                    left: rect.left,
+                                    width: rect.width,
+                                  });
+                                  setOpenCustomerSearch(index);
+                                  setCustomerSearch("");
+                                }}
+                              >
+                                <span className={row.customer_id ? "text-gray-900" : "text-gray-400"}>{customerList.find((c) => c.id === row.customer_id)?.nama ?? "Pilih customer..."}</span>
+                                <Search size={16} className="text-gray-400" />
+                              </button>
+
+                              {openCustomerSearch === index && customerDropdownRect && (
+                                <div
+                                  ref={customerDropdownRef}
+                                  className="fixed z-[9999] rounded-xl border bg-white p-2 shadow-2xl"
+                                  style={{
+                                    top: customerDropdownRect.top,
+                                    left: customerDropdownRect.left,
+                                    width: customerDropdownRect.width,
+                                  }}
+                                >
+                                  <div className="relative mb-2">
+                                    <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <input
+                                      autoFocus
+                                      value={customerSearch}
+                                      onChange={(e) => setCustomerSearch(e.target.value)}
+                                      placeholder="Cari customer..."
+                                      className="w-full rounded-lg border px-9 py-2 text-sm outline-none focus:border-black"
+                                    />
+                                  </div>
+
+                                  <div className="max-h-56 overflow-y-auto">
+                                    {customerList
+                                      .filter((c) => {
+                                        const q = customerSearch.trim().toLowerCase();
+                                        return !q || c.nama.toLowerCase().includes(q);
+                                      })
+                                      .map((c) => (
+                                        <div key={c.id} className="flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-gray-50">
+                                          <button
+                                            type="button"
+                                            className="min-w-0 flex-1 rounded-lg px-2 py-2 text-left"
+                                            onClick={() => {
+                                              updateRow(index, "customer_id", c.id);
+                                              setOpenCustomerSearch(null);
+                                              setCustomerSearch("");
+                                            }}
+                                          >
+                                            <div className="truncate text-sm font-medium">{c.nama}</div>
+                                          </button>
+                                        </div>
+                                      ))}
+
+                                    {customerList.filter((c) => {
+                                      const q = customerSearch.trim().toLowerCase();
+                                      return !q || c.nama.toLowerCase().includes(q);
+                                    }).length === 0 && <div className="p-4 text-center text-sm text-gray-500">Customer tidak ditemukan.</div>}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
 
                             <button
                               type="button"

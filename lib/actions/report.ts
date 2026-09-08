@@ -40,7 +40,9 @@ async function requireTechnician() {
 }
 
 type ReportInsert = {
+  report_id?: string | null;
   tanggal: string;
+  urutan?: number;
   customer_id: string | null;
   mesin_id: string | null;
   is_backup: boolean;
@@ -79,7 +81,7 @@ export async function getReportMaster() {
 
   const [{ data: customers, error: customerError }, { data: mesin, error: mesinError }] = await Promise.all([
     supabase.from("customer").select("id, nama, alamat").in("id", customerIds).order("nama"),
-    supabase.from("mesin").select("id, customer_id, tipe_mesin, nomor_seri").in("customer_id", customerIds).order("nomor_seri"),
+    supabase.from("mesin").select("id, customer_id, tipe_mesin, nomor_seri").in("customer_id", customerIds).eq("status", "aktif").order("nomor_seri"),
   ]);
 
   if (customerError) throw new Error(customerError.message);
@@ -97,7 +99,7 @@ export async function getReportByDate(tanggal: string) {
   const user = await requireTechnician();
   const supabase = createSupabaseAdmin();
 
-  const { data, error } = await supabase.from("report_harian").select("*").eq("tanggal", tanggal).eq("created_by", user.id).order("id", { ascending: true });
+  const { data, error } = await supabase.from("report_harian").select("*").eq("tanggal", tanggal).eq("created_by", user.id).order("urutan", { ascending: true }).order("id", { ascending: true });
 
   if (error) {
     throw new Error(error.message);
@@ -117,17 +119,89 @@ export async function saveReport(payload: ReportInsert[]) {
     throw new Error("Belum ada data yang bisa disimpan.");
   }
 
-  const rows = payload.map((row) => ({
-    ...row,
-    created_by: user.id,
-  }));
+  const tanggal = payload[0]?.tanggal?.trim();
+
+  if (!tanggal) {
+    throw new Error("Tanggal report tidak valid.");
+  }
+
+  if (payload.some((row) => row.tanggal !== tanggal)) {
+    throw new Error("Tanggal report tidak konsisten.");
+  }
 
   const supabase = createSupabaseAdmin();
 
-  const { error } = await supabase.from("report_harian").insert(rows);
+  // Ambil report yang saat ini tersimpan untuk tanggal + teknisi ini.
+  const { data: existingReports, error: existingError } = await supabase.from("report_harian").select("id").eq("tanggal", tanggal).eq("created_by", user.id);
 
-  if (error) {
-    throw new Error(error.message);
+  if (existingError) {
+    throw new Error(existingError.message);
+  }
+
+  const existingIds = new Set((existingReports ?? []).map((row) => String(row.id)));
+
+  // ID yang datang dari browser dan benar-benar merupakan ID database.
+  // Row baru menggunakan Date.now(), jadi tidak akan dianggap sebagai UUID.
+  const incomingExistingIds = new Set(
+    payload
+      .map((row) => {
+        if (typeof row.report_id !== "string") return null;
+
+        const id = row.report_id.trim();
+        return id !== "" ? id : null;
+      })
+      .filter((id): id is string => id !== null),
+  );
+
+  // Hapus row lama yang memang sudah dihapus dari tabel di browser.
+  const idsToDelete = [...existingIds].filter((id) => !incomingExistingIds.has(id));
+
+  if (idsToDelete.length > 0) {
+    const { error: deleteError } = await supabase.from("report_harian").delete().eq("created_by", user.id).in("id", idsToDelete);
+
+    if (deleteError) {
+      throw new Error(deleteError.message);
+    }
+  }
+
+  // Update row lama dan insert row baru.
+  for (let index = 0; index < payload.length; index += 1) {
+    const row = payload[index];
+
+    const data = {
+      tanggal,
+      urutan: index + 1,
+      customer_id: row.customer_id,
+      mesin_id: row.mesin_id,
+      is_backup: row.is_backup,
+      customer_backup: row.customer_backup,
+      alamat_backup: row.alamat_backup,
+      tipe_mesin_backup: row.tipe_mesin_backup,
+      nomor_seri_backup: row.nomor_seri_backup,
+      jenis: row.jenis,
+      masalah: row.masalah,
+      jam_masuk: row.jam_masuk,
+      jam_keluar: row.jam_keluar,
+      keterangan: row.keterangan,
+      note: row.note,
+      created_by: user.id,
+    };
+
+    const reportId = row.report_id?.trim();
+
+    if (reportId && existingIds.has(reportId)) {
+      const { error: updateError } = await supabase.from("report_harian").update(data).eq("id", reportId).eq("created_by", user.id);
+
+      if (updateError) {
+        throw new Error(updateError.message);
+      }
+    } else {
+      const { error: insertError } = await supabase.from("report_harian").insert(data);
+
+      if (insertError) {
+        throw new Error(insertError.message);
+      }
+    }
   }
 
   revalidatePath("/report");

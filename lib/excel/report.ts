@@ -12,26 +12,20 @@ export type ExcelRow = {
   keterangan: string;
 };
 
-export async function exportReportExcel(tanggal: string, teknisi: string, wilayah: string, note: string, rows: ExcelRow[]) {
+export async function createReportExcel(tanggal: string, teknisi: string, wilayah: string, note: string, rows: ExcelRow[]): Promise<File> {
   const workbook = new ExcelJS.Workbook();
 
   workbook.creator = "Rental Report";
-
   workbook.created = new Date();
 
   const sheet = workbook.addWorksheet("Report");
 
   sheet.pageSetup = {
-    paperSize: 9, // A4
-
+    paperSize: 9,
     orientation: "landscape",
-
     fitToPage: true,
-
     fitToWidth: 1,
-
     fitToHeight: 0,
-
     margins: {
       left: 0.3,
       right: 0.3,
@@ -41,27 +35,21 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
       footer: 0.2,
     },
   };
-  sheet.columns = [
-    { width: 8 }, // No
-    { width: 8 }, // Jenis
-    { width: 28 }, // Customer
-    { width: 12 }, // Type
-    { width: 20 }, // Nomor Seri
-    { width: 32 }, // Masalah
-    { width: 10 }, // Jam In
-    { width: 10 }, // Jam Out
-    { width: 8 }, // Ket
-  ];
+
+  sheet.columns = [{ width: 8 }, { width: 8 }, { width: 28 }, { width: 12 }, { width: 20 }, { width: 32 }, { width: 10 }, { width: 10 }, { width: 8 }];
+
   sheet.properties.defaultRowHeight = 22;
+
   sheet.eachRow((row) => {
     row.font = {
       name: "Calibri",
       size: 11,
     };
   });
+
   /* ===================================
-   TITLE
-=================================== */
+      TITLE
+  =================================== */
 
   sheet.mergeCells("B2:I2");
 
@@ -80,12 +68,8 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
   };
 
   /* ===================================
-   HEADER
-=================================== */
-
-  // =======================
-  // TANGGAL
-  // =======================
+     HEADER
+  =================================== */
 
   sheet.getCell("A4").value = "Tanggal";
   sheet.getCell("B4").value = ":";
@@ -103,10 +87,6 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
     vertical: "middle",
   };
 
-  // =======================
-  // TEKNISI
-  // =======================
-
   sheet.getCell("A6").value = "Teknisi";
   sheet.getCell("B6").value = ":";
 
@@ -118,10 +98,6 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
     horizontal: "left",
     vertical: "middle",
   };
-
-  // =======================
-  // WILAYAH
-  // =======================
 
   sheet.getCell("F6").value = "Wilayah";
   sheet.getCell("G6").value = ":";
@@ -142,9 +118,9 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
     bottom: { style: "thin" },
   };
 
-  // =======================
-  // STYLE
-  // =======================
+  /* ===================================
+     STYLE
+  =================================== */
 
   ["A4", "A6", "F6"].forEach((cell) => {
     sheet.getCell(cell).font = {
@@ -155,9 +131,10 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
   sheet.getRow(2).height = 28;
   sheet.getRow(4).height = 20;
   sheet.getRow(6).height = 22;
+
   /* ===================================
-   TABLE HEADER
-=================================== */
+     TABLE HEADER
+  =================================== */
 
   const headerRow = 8;
 
@@ -194,9 +171,10 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
   });
 
   sheet.getRow(headerRow).height = 22;
+
   /* ===================================
-   DATA
-=================================== */
+     DATA
+  =================================== */
 
   const maxRows = 10;
 
@@ -234,13 +212,33 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
       };
     });
 
-    row.getCell(1).alignment = { horizontal: "center" };
-    row.getCell(2).alignment = { horizontal: "center" };
-    row.getCell(4).alignment = { horizontal: "center" };
-    row.getCell(5).alignment = { horizontal: "center" };
-    row.getCell(7).alignment = { horizontal: "center" };
-    row.getCell(8).alignment = { horizontal: "center" };
-    row.getCell(9).alignment = { horizontal: "center" };
+    row.getCell(1).alignment = {
+      horizontal: "center",
+    };
+
+    row.getCell(2).alignment = {
+      horizontal: "center",
+    };
+
+    row.getCell(4).alignment = {
+      horizontal: "center",
+    };
+
+    row.getCell(5).alignment = {
+      horizontal: "center",
+    };
+
+    row.getCell(7).alignment = {
+      horizontal: "center",
+    };
+
+    row.getCell(8).alignment = {
+      horizontal: "center",
+    };
+
+    row.getCell(9).alignment = {
+      horizontal: "center",
+    };
 
     row.getCell(3).alignment = {
       wrapText: true,
@@ -252,6 +250,7 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
       vertical: "middle",
     };
   }
+
   rows.forEach((_, index) => {
     const row = sheet.getRow(headerRow + index + 1);
 
@@ -264,6 +263,7 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
       };
     });
   });
+
   rows.forEach((_, index) => {
     const row = sheet.getRow(headerRow + index + 1);
 
@@ -294,9 +294,6 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
     row.getCell(9).alignment = {
       horizontal: "center",
     };
-  });
-  rows.forEach((_, index) => {
-    const row = sheet.getRow(headerRow + index + 1);
 
     row.getCell(3).alignment = {
       wrapText: true,
@@ -308,9 +305,10 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
       vertical: "middle",
     };
   });
+
   /* ===================================
-   NOTE
-=================================== */
+     NOTE
+  =================================== */
 
   const noteRow = headerRow + 10 + 2;
 
@@ -337,14 +335,17 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
     right: { style: "thin" },
     bottom: { style: "thin" },
   };
+
   /* ===================================
-   SIGNATURE
-=================================== */
+     SIGNATURE
+  =================================== */
 
   const signRow = noteRow + 1;
 
   sheet.getCell(`B${signRow}`).value = "Teknisi";
+
   sheet.getCell(`D${signRow}`).value = "Leader";
+
   sheet.getCell(`F${signRow}`).value = "Supervisor";
 
   ["B", "D", "F"].forEach((col) => {
@@ -360,7 +361,9 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
   const nameRow = signRow + 4;
 
   sheet.getCell(`B${nameRow}`).value = teknisi;
+
   sheet.getCell(`D${nameRow}`).value = "Pramono";
+
   sheet.getCell(`F${nameRow}`).value = "";
 
   ["B", "D", "F"].forEach((col) => {
@@ -368,9 +371,10 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
       horizontal: "center",
     };
   });
+
   /* ===================================
-   DOWNLOAD
-=================================== */
+     FILE
+  =================================== */
 
   const buffer = await workbook.xlsx.writeBuffer();
 
@@ -382,5 +386,13 @@ export async function exportReportExcel(tanggal: string, teknisi: string, wilaya
     })
     .replace(/\//g, "-");
 
-  saveAs(new Blob([buffer]), `Jadwal Kunjungan ${teknisi}-${tanggalFile}.xlsx`);
+  return new File([buffer], `Jadwal Kunjungan ${teknisi}-${tanggalFile}.xlsx`, {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
+
+export async function exportReportExcel(tanggal: string, teknisi: string, wilayah: string, note: string, rows: ExcelRow[]) {
+  const file = await createReportExcel(tanggal, teknisi, wilayah, note, rows);
+
+  saveAs(file, file.name);
 }

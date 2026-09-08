@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import MesinSearch from "./mesin-search";
 import MesinAction from "./mesin-action";
 import MesinEditDialog from "./mesin-edit-dialog";
 import MesinDeleteDialog from "./mesin-delete-dialog";
+import MesinTarikDialog from "./mesin-tarik-dialog";
 
 import type { Mesin, Customer } from "@/types/mesin";
 
@@ -16,6 +17,8 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
 
   const [openDelete, setOpenDelete] = useState(false);
 
+  const [openTarik, setOpenTarik] = useState(false);
+
   const [selectedMesin, setSelectedMesin] = useState<Mesin | null>(null);
 
   const pageSize = 10;
@@ -23,12 +26,15 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
   const [currentPage, setCurrentPage] = useState(1);
 
   const filtered = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+
+    if (!keyword) return data;
+
     return data.filter((item) => {
-      return (item.customer?.nama ?? "").toLowerCase().includes(search.toLowerCase()) || item.tipe_mesin.toLowerCase().includes(search.toLowerCase()) || item.nomor_seri.toLowerCase().includes(search.toLowerCase());
+      return (item.customer?.nama ?? "").toLowerCase().includes(keyword) || item.tipe_mesin.toLowerCase().includes(keyword) || item.nomor_seri.toLowerCase().includes(keyword);
     });
   }, [search, data]);
 
-  // Balik ke halaman pertama saat search berubah
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
@@ -86,6 +92,10 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
                           setSelectedMesin(item);
                           setOpenEdit(true);
                         }}
+                        onTarik={() => {
+                          setSelectedMesin(item);
+                          setOpenTarik(true);
+                        }}
                         onDelete={() => {
                           setSelectedMesin(item);
                           setOpenDelete(true);
@@ -99,10 +109,8 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
           </table>
         </div>
 
-        {/* Pagination */}
-
         <div className="flex items-center justify-between border-t bg-gray-50 px-4 py-3">
-          <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="rounded-lg border px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="button" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="rounded-lg border px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
             ← Sebelumnya
           </button>
 
@@ -110,13 +118,15 @@ export default function MesinTable({ data, customers }: { data: Mesin[]; custome
             Halaman <span className="font-semibold">{currentPage}</span> dari <span className="font-semibold">{totalPages}</span>
           </div>
 
-          <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="rounded-lg border px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="button" onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages} className="rounded-lg border px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50">
             Selanjutnya →
           </button>
         </div>
       </div>
 
       <MesinEditDialog open={openEdit} onOpenChange={setOpenEdit} mesin={selectedMesin} customers={customers} />
+
+      <MesinTarikDialog open={openTarik} onOpenChange={setOpenTarik} mesin={selectedMesin} />
 
       <MesinDeleteDialog open={openDelete} onOpenChange={setOpenDelete} mesin={selectedMesin} />
     </>
