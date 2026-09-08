@@ -274,13 +274,36 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
 
       const file = await createReportExcel(tanggal, teknisi, wilayah, note, getExportRows());
 
+      // Coba native share terlebih dahulu
       const shared = await shareFile(file);
 
-      if (!shared) {
-        alert("Browser HP ini tidak mendukung berbagi file langsung. Coba buka menggunakan Chrome atau Safari terbaru.");
+      if (shared) {
+        setShareModal(false);
+        return;
       }
 
+      // Native share gagal:
+      // download Excel asli
+      const url = URL.createObjectURL(file);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.name;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 1000);
+
       setShareModal(false);
+
+      // Buka WhatsApp
+      setTimeout(() => {
+        window.location.href = `https://wa.me/?text=${encodeURIComponent(getShareText())}`;
+      }, 700);
     } catch (error: any) {
       console.error("SHARE EXCEL ERROR:", error);
 
