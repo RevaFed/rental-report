@@ -229,7 +229,6 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
     }
 
     try {
-      // Coba share file langsung ke native Share Sheet HP
       await navigator.share({
         title: `Report Harian ${tanggal}`,
         text: getShareText(),
@@ -238,7 +237,6 @@ export default function ReportPage({ customers, mesin, teknisi, wilayah, initial
 
       return true;
     } catch (error: any) {
-      // User menekan tombol Batal pada Share Sheet
       if (error?.name === "AbortError") {
         return true;
       }

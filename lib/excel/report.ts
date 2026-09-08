@@ -386,8 +386,13 @@ export async function createReportExcel(tanggal: string, teknisi: string, wilaya
     })
     .replace(/\//g, "-");
 
-  return new File([buffer], `Jadwal Kunjungan ${teknisi}-${tanggalFile}.xlsx`, {
+  const blob = new Blob([buffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
+  return new File([blob], `Jadwal Kunjungan ${teknisi}-${tanggalFile}.xlsx`, {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    lastModified: Date.now(),
   });
 }
 
